@@ -1,6 +1,7 @@
 # next.config.js
 
 SUPABASE_URL - Setting > API > Project URL > URL
+
 SUPABASE_ANON_KEY - Setting > API > Project API keys > `anon` `public`
 
 # Next.JS

@@ -1,41 +1,58 @@
 import Head from 'next/head'
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { GlobalContext } from "@utils/GlobalContext";
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Skeletons from '@components/Skeletons';
+import { supabase } from '@libs/Supabase';
 
-export async function getServerSideProps() {
-  const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
+// export async function getServerSideProps() {
+//   const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
 
-  // const { data } = await supabaseAdmin.from('artist').select(`*, song (*)`).order('id');
-  const { data } = await supabaseAdmin
-    .from('artist')
-    .select(`
-      id,
-      name,
-      genre,
-      coverUrl,
-      song (
-        id,
-        name,
-        youtubeId,
-        albumCoverUrl,
-        artistId
-      )
-    `)
-    .order('id');
+//   // const { data } = await supabaseAdmin.from('artist').select(`*, song (*)`).order('id');
+//   const { data } = await supabaseAdmin
+//     .from('artist')
+//     .select(`
+//       id,
+//       name,
+//       genre,
+//       coverUrl,
+//       song (
+//         id,
+//         name,
+//         youtubeId,
+//         albumCoverUrl,
+//         artistId
+//       )
+//     `)
+//     .order('id');
 
-  return {
-    props: {
-      artists: data
-    }
-  };
-}
+//   return {
+//     props: {
+//       artists: data
+//     }
+//   };
+// }
 
-export default function Home({ artists }) {
+// export default function Artists({ artists }) {
+export default function Artists() {
   const { darkMode, setDarkMode } = useContext(GlobalContext);
-  console.log(artists)
+  const [fetched, setFetched] = useState(false);
+  const [artists, setArtists] = useState();
+
+  async function getArtists() {
+    const { data } = await supabase.from('artist').select(`*, song (*)`).order('id');
+    setArtists(data)
+    setFetched(true)
+  }
+
+  useEffect(() => {
+    if (!fetched || !artists) {
+      getArtists();
+    }
+  }, [fetched])
+
   return (
     <>
       <Head>
@@ -60,9 +77,45 @@ export default function Home({ artists }) {
           </nav>
 
           <h1 className="text-neutral-700 dark:text-gray-100 text-2xl font-bold">Artist List</h1>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {artists.map(artist =>
+            {fetched ?
+              artists.map(artist =>
+                <div key={artist.id} className="border dark:border-neutral-800 rounded my-2">
+                  <Link href={`artist/${artist.id}`}>
+                    <div className="group">
+                      <div className="transition duration-300 hover:cursor-pointer">
+                        <div className="relative h-56 md:h-52">
+                          <Image
+                            alt={artist.name}
+                            src={artist.coverUrl}
+                            className="rounded"
+                            layout='fill'
+                          />
+                        </div>
+                        <div className="p-3 flex justify-between">
+                          <div>
+                            <h2 className="text-md sm:text-lg font-medium dark:text-white text-neutral-800 group-hover:text-blue-500 transition duration-300">{artist.name}</h2>
+                            <p className="text-sm sm:text-base text-neutral-700 dark:text-gray-300 mt-1">{artist.genre}</p>
+                          </div>
+                          <div className="flex items-end">
+                            <p className="text-sm  text-neutral-700 dark:text-gray-300">{artist.song.length} song</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )
+              :
+              <>
+                <Skeletons className="!h-52" />
+                <Skeletons className="!h-52" />
+              </>
+            }
+            {/* {artists.map(artist =>
               <div key={artist.id} className="border dark:border-neutral-800 rounded my-2">
                 <Link href={`artist/${artist.id}`}>
                   <div className="group">
@@ -88,7 +141,7 @@ export default function Home({ artists }) {
                   </div>
                 </Link>
               </div>
-            )}
+            )} */}
           </div>
 
         </div>

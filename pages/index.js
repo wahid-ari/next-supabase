@@ -1,40 +1,57 @@
 import Head from 'next/head';
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { GlobalContext } from "@utils/GlobalContext";
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Skeletons from '@components/Skeletons';
+import { supabase } from '@libs/Supabase';
 
-export async function getServerSideProps() {
-  const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
+// export async function getServerSideProps() {
+//   const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
 
-  // const { data } = await supabaseAdmin.from('song').select(`*, artist (*)`).order('id');
-  const { data } = await supabaseAdmin
-    .from('song')
-    .select(`
-      id,
-      name,
-      youtubeId,
-      albumCoverUrl,
-      artistId,
-      artist (
-        id,
-        name,
-        genre,
-        coverUrl
-      )
-    `)
-    .order('id');
+//   // const { data } = await supabaseAdmin.from('song').select(`*, artist (*)`).order('id');
+//   const { data } = await supabaseAdmin
+//     .from('song')
+//     .select(`
+//       id,
+//       name,
+//       youtubeId,
+//       albumCoverUrl,
+//       artistId,
+//       artist (
+//         id,
+//         name,
+//         genre,
+//         coverUrl
+//       )
+//     `)
+//     .order('id');
 
-  return {
-    props: {
-      songs: data
-    }
-  };
-}
+//   return {
+//     props: {
+//       songs: data
+//     }
+//   };
+// }
 
-export default function Home({ songs }) {
+// export default function Home({ songs }) {
+export default function Home() {
   const { darkMode, setDarkMode } = useContext(GlobalContext);
+  const [fetched, setFetched] = useState(false);
+  const [songs, setSongs] = useState();
+
+  async function getSong() {
+    const { data } = await supabase.from('song').select(`*, artist (*)`).order('id');
+    setSongs(data)
+    setFetched(true)
+  }
+
+  useEffect(() => {
+    if (!fetched || !songs) {
+      getSong();
+    }
+  }, [fetched])
 
   return (
     <>
@@ -62,7 +79,36 @@ export default function Home({ songs }) {
           <h1 className="text-neutral-700 dark:text-gray-100 text-2xl font-bold">Song List</h1>
 
           <div className="mt-8">
-            {songs.map(song =>
+            {fetched ?
+              songs.map(song =>
+                <div key={song.id} className="border dark:border-neutral-800 rounded my-2">
+                  <Link href={`song/${song.id}`}>
+                    <div className="group">
+                      <div className="flex items-center gap-4 transition duration-300 hover:cursor-pointer">
+                        <div className="relative h-16 sm:h-24 w-16 sm:w-24">
+                          <Image
+                            alt={song.name}
+                            src={song.albumCoverUrl}
+                            className="rounded"
+                            layout='fill'
+                          />
+                        </div>
+                        <div className="p-2">
+                          <h2 className="text-md sm:text-lg font-medium dark:text-white text-neutral-800 mb-2 group-hover:text-blue-500 transition duration-300">{song.name}</h2>
+                          <p className="text-sm sm:text-base text-neutral-700 dark:text-gray-300">{song.artist.name}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )
+              :
+              <>
+                <Skeletons className="!h-16 md:!h-20" />
+                <Skeletons className="!h-16 md:!h-20" />
+              </>
+            }
+            {/* {songs.map(song =>
               <div key={song.id} className="border dark:border-neutral-800 rounded my-2">
                 <Link href={`song/${song.id}`}>
                   <div className="group">
@@ -83,7 +129,7 @@ export default function Home({ songs }) {
                   </div>
                 </Link>
               </div>
-            )}
+            )} */}
           </div>
 
         </div>

@@ -4,8 +4,8 @@ import { GlobalContext } from "@utils/GlobalContext";
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import Skeletons from '@components/Skeletons';
 import { supabase } from '@libs/Supabase';
+import SkeletonSongList from '@components/SkeletonSongList';
 
 // export async function getServerSideProps() {
 //   const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
@@ -104,8 +104,16 @@ export default function Home() {
               )
               :
               <>
-                <Skeletons className="!h-16 md:!h-20" />
-                <Skeletons className="!h-16 md:!h-20" />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
+                <SkeletonSongList />
               </>
             }
             {/* {songs.map(song =>

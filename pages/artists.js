@@ -4,8 +4,8 @@ import { GlobalContext } from "@utils/GlobalContext";
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import Skeletons from '@components/Skeletons';
 import { supabase } from '@libs/Supabase';
+import SkeletonArtistList from '@components/SkeletonArtistList';
 
 // export async function getServerSideProps() {
 //   const supabaseAdmin = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_ANON_KEY || '');
@@ -111,8 +111,10 @@ export default function Artists() {
               )
               :
               <>
-                <Skeletons className="!h-52" />
-                <Skeletons className="!h-52" />
+                <SkeletonArtistList />
+                <SkeletonArtistList />
+                <SkeletonArtistList />
+                <SkeletonArtistList />
               </>
             }
             {/* {artists.map(artist =>

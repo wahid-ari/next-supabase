@@ -107,15 +107,18 @@ export default function Artist() {
                     </Link>
                   )}
                 </div>
-                <Link href="/artists">
-                  <span className="text-blue-500 hover:text-blue-600 transition-all cursor-pointer text-sm font-medium">Back to Artists List</span>
-                </Link>
               </div>
             </>
             :
             <>
-              <Skeletons className="!w-16" />
-              <Skeletons className="!h-52" />
+              <Skeletons className="!h-8 !w-40" />
+              <Skeletons className="!h-6 !w-16 !mb-4" />
+              <Skeletons className="!h-52 !mb-4" />
+              <Skeletons className="!h-6 !w-32" />
+              <Skeletons className="!h-6 !w-32" />
+              <Skeletons className="!h-6 !w-32" />
+              <Skeletons className="!h-6 !w-32" />
+              <Skeletons className="!h-6 !w-32" />
             </>
           }
 
